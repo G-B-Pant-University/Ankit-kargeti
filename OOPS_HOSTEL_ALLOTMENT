@@ -1,0 +1,141 @@
+import java.util.*;
+
+class Student {
+    String name;
+    char gender;
+    String course;
+
+    Student(String name, char gender, String course) {
+        this.name = name;
+        this.gender = gender;
+        this.course = course;
+    }
+}
+
+class Room {
+    int capacity = 2;
+
+    int count = 0;
+    Student[] occupants = new Student[capacity];
+
+    boolean canAllot(Student s) {
+        if (count == capacity) {
+            return false;
+        }
+        if (count == 0) {
+            return true;
+        }
+        Student first = occupants[0];
+        return first.gender == s.gender && first.course.equals(s.course);
+    }
+
+    boolean allot(Student s) {
+        if (!canAllot(s)) {
+            return false;
+        }
+        occupants[count] = s;
+        count++;
+        return true;
+    }
+}
+
+public class hostelAllotment {
+
+    static int allotStudent(Room[] r, Student s) {
+        for (int i = 0; i < r.length; i++) {
+            if (r[i].count == 1 && r[i].allot(s)) {
+                return i;
+            }
+        }
+        for (int i = 0; i < r.length; i++) {
+            if (r[i].count == 0 && r[i].allot(s)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static void main(String[] args) {
+        int c = 0;
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("Enter number of students");
+        int totalStudents = sc.nextInt();
+
+        System.out.println("Enter number of rooms");
+        int totalRooms = sc.nextInt();
+
+        Room[] r = new Room[totalRooms];
+        for (int i = 0; i < totalRooms; i++) {
+            r[i] = new Room();
+        }
+        String[] stu = new  String[totalStudents];
+
+        for (int i = 0; i < totalStudents; i++) {
+            
+            System.out.println("Enter the name of student " + (i + 1));
+            String name = sc.next();
+
+            char g;
+            while (true) {
+                System.out.println("Enter the gender (M/F) of student " + (i + 1));
+                g = sc.next().charAt(0);
+                if (g == 'M' || g == 'F') {
+                    break;
+                }
+                System.out.println("Invalid gender");
+            }
+
+            String course;
+            while (true) {
+                System.out.println("Enter the course (UG/PG) of student " + (i + 1));
+                course = sc.next();
+                if (course.equals("UG") || course.equals("PG")) {
+                    break;
+                }
+                System.out.println("Invalid course");
+            }
+
+            Student st = new Student(name, g, course);
+            int room = allotStudent(r, st);
+
+            if (room != -1) {
+                System.out.println(">> " + name + " allotted Room " + (room + 1));
+
+            } else {
+                System.out.println(">> No room available for " + name + ". Check another hostel.");
+                System.out.println("room not alloted - " + name);
+                c++;
+                for(int j=0;j<c;j++){
+                stu[j] = name;
+               };
+            }
+        }
+
+        System.out.println("Final Room Allotment");
+        for (int i = 0; i < totalRooms; i++) {
+            System.out.print("Room " + (i + 1) + ": ");
+            if (r[i].count == 0) {
+                System.out.println("Empty");
+                continue;
+            }
+            for (int j = 0; j < r[i].count; j++) {
+                Student s = r[i].occupants[j];
+                System.out.print(s.name + " (" + s.gender + ", " + s.course + ")");
+                if (j < r[i].count - 1) {
+                    System.out.print("  &  ");
+                }
+                
+            }
+            System.out.println();
+        }
+        System.out.println("");
+
+        System.out.println("Students who did not get a room:");
+        for(int i=0;i<c;i++){
+        System.out.println((i+1) + " " + stu[i]);
+        }
+
+        sc.close();
+    }
+}
